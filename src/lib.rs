@@ -8,6 +8,9 @@ use oasis_runtime_sdk::{self as sdk, modules, types::token::Denomination, Versio
 // Note that everything is statically defined, so the runtime has no state.
 pub struct Runtime;
 
+pub struct EmptyConfig;
+impl modules::core::Config for EmptyConfig {}
+
 impl sdk::Runtime for Runtime {
     // Use the crate version from Cargo.toml as the runtime version.
     const VERSION: Version = sdk::version_from_cargo!();
@@ -15,7 +18,11 @@ impl sdk::Runtime for Runtime {
     // Define the modules that the runtime will be composed of. Here we just use
     // the core and accounts modules from the SDK. Later on we will go into
     // detail on how to create your own modules.
-    type Modules = (modules::core::Module, modules::accounts::Module);
+    type Core = modules::core::Module<EmptyConfig>;
+    type Modules = (
+        modules::core::Module<EmptyConfig>,
+        modules::accounts::Module,
+    );
 
     // Define the genesis (initial) state for all of the specified modules. This
     // state is used when the runtime is first initialized.
@@ -44,20 +51,20 @@ impl sdk::Runtime for Runtime {
                     // Alice.
                     b.insert(sdk::testing::keys::alice::address(), {
                         let mut d = BTreeMap::new();
-                        d.insert(Denomination::NATIVE, 1_000.into());
+                        d.insert(Denomination::NATIVE, 1_000_u128);
                         d
                     });
                     // Bob.
                     b.insert(sdk::testing::keys::bob::address(), {
                         let mut d = BTreeMap::new();
-                        d.insert(Denomination::NATIVE, 2_000.into());
+                        d.insert(Denomination::NATIVE, 2_000_u128);
                         d
                     });
                     b
                 },
                 total_supplies: {
                     let mut ts = BTreeMap::new();
-                    ts.insert(Denomination::NATIVE, 3_000.into());
+                    ts.insert(Denomination::NATIVE, 3_000_u128);
                     ts
                 },
                 ..Default::default()
